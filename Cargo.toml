@@ -1,0 +1,13 @@
+[package]
+name = "same54_test"
+version = "0.1.0"
+authors = ["Per Lindgren <per.lindgren@ltu.se>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# [patch.crates-io]
+# probe-rs = { git = 'https://github.com/perlindgren/probe-rs.git', branch = 'atsame54' }
+
+[dependencies]
+probe-rs = { path = "../probe-rs/probe-rs" }
