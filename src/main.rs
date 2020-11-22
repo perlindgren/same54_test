@@ -1,31 +1,36 @@
-use probe_rs::{config::TargetSelector, Probe, Target, WireProtocol};
-use std::convert::From;
+use probe_rs::MemoryInterface;
+use probe_rs::Session;
 
 fn main() {
-    println!("Attempt to connect to SAME54P20A");
+    println!("SAME54P20A demo");
 
-    // Get a list of all available debug probes.
-    let probes = Probe::list_all();
-
-    println!("Probes {:?}", probes);
-
-    // Use the first probe found.
-    let mut probe = probes[0].open().unwrap();
-
-    probe
-        .select_protocol(WireProtocol::Swd)
-        .expect("SWD failed");
-
-    let target_selector: TargetSelector = "ATSAME54P20A".into();
-    println!("target {:?}", target_selector);
-    // let target: Target = target_selector.into();
-
-    // Attach to a chip.
-    let mut session = probe.attach(target_selector).unwrap(); // .expect("failure");
-
-    // Select a core.
+    let mut session = Session::auto_attach("ATSAME54P20A").unwrap();
     let mut core = session.core(0).unwrap();
 
-    // Halt the attached core.
-    // core.halt().unwrap();
+    // Read a single 32 bit word.
+    let word = core.read_word_32(0x2000_0000).unwrap();
+
+    // Writing is just as simple.
+    let buff = [0xdeadbeefu32; 50];
+    core.write_32(0x2000_0000, &buff).unwrap();
+
+    // Read a single 32 bit word.
+    let word = core.read_word_32(0x2000_0000).unwrap();
+
+    println!("word {:#X}", word);
+
+    // of course we can also write 8bit words.
+    let buff = [0x66; 50];
+    core.write_8(0x2000_0000, &buff).unwrap();
+
+    // Read a single 32 bit word.
+    let word = core.read_word_32(0x2000_0000).unwrap();
+
+    // Read a block of 50 32 bit words.
+    let mut buff = [0u32; 50];
+    core.read_32(0x2000_0000, &mut buff).unwrap();
+
+    for i in buff.into_iter() {
+        println!("buff {:#X}", i);
+    }
 }
